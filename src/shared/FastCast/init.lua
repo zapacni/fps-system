@@ -1,5 +1,6 @@
 ---@diagnostic disable: unused-local
 --!nocheck
+-- adapted from https://devforum.roblox.com/t/making-a-combat-game-with-ranged-weapons-fastcast-may-be-the-module-for-you/133474/
 
 local FastCast = {}
 FastCast.DebugLogging = false

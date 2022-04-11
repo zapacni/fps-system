@@ -1,5 +1,13 @@
 --!strict
 ---@diagnostic disable: redefined-local
+
+--[[
+	This would be difficult if not impossible without the following references:
+	https://devforum.roblox.com/t/making-an-fps-framework-2020-edition/503318
+	https://devforum.roblox.com/t/making-an-fps-framework-2020-edition-part-2/581791
+	https://devforum.roblox.com/t/the-first-person-element-of-a-first-person-shooter/160434/
+]]
+
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local SoundService = game:GetService("SoundService")
 local RunService = game:GetService("RunService")
