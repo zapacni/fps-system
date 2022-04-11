@@ -1,4 +1,5 @@
 --!nocheck
+-- https://github.com/zapacni/PlayerMouse2
 
 local PlayerMouse2 = { }
 PlayerMouse2.TargetFilter = { }

@@ -1,3 +1,5 @@
+-- adapted from https://github.com/Quenty/NevermoreEngine/blob/main/src/spring/src/Shared/Spring.lua
+
 --[=[
 	A physical model of a spring, useful in many applications.
 	A spring is an object that will compute based upon Hooke's law. Properties only evaluate
