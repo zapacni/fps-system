@@ -1,6 +1,10 @@
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Workspace = game:GetService("Workspace")
 
+local shared_modules = ReplicatedStorage:WaitForChild("Shared")
+
 local fracture_part = require(script.Parent:WaitForChild("fracture_part"))
+local fps_config = require(shared_modules:WaitForChild("fps_config"))
 
 local function explode_object(part: BasePart)
 	if not part.Parent then
@@ -31,7 +35,7 @@ local function explode_object(part: BasePart)
 	explosion.Parent = Workspace
 
 	local sound = Instance.new("Sound")
-	sound.SoundId = "rbxasseid://9114362251"
+	sound.SoundId = fps_config.sounds.explosion
 	sound.PlayOnRemove = true
 	sound.Parent = part
 	part:Destroy()

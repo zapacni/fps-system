@@ -5,7 +5,12 @@ wedge.Anchored = true
 wedge.TopSurface = Enum.SurfaceType.Smooth
 wedge.BottomSurface = Enum.SurfaceType.Smooth
 
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Workspace = game:GetService("Workspace")
+
+local shared_modules = ReplicatedStorage:WaitForChild("Shared")
+
+local fps_config = require(shared_modules:WaitForChild("fps_config"))
 local break_sounds = require(script.Parent:WaitForChild("break_sounds"))
 
 local function draw_triangle(a: Vector3, b: Vector3, c: Vector3)
@@ -38,6 +43,10 @@ local function draw_triangle(a: Vector3, b: Vector3, c: Vector3)
 end
 
 local function fracture_part(part: BasePart, center: Vector3, impulse: Vector3, lifetime: number)
+	center = center or part.Position
+	impulse = impulse or Vector3.zero
+	lifetime = lifetime or 5
+
 	local cs, cf = part.Size, part.CFrame
 	local transparency = part.Transparency
 	local material = part.Material
@@ -69,8 +78,7 @@ local function fracture_part(part: BasePart, center: Vector3, impulse: Vector3, 
 	end
 
 	local sound = Instance.new("Sound")
-	sound.SoundId = break_sounds.get_sound_for_part(part) or "rbxassetid://6700552345"
-	sound.Volume = 1
+	sound.SoundId = break_sounds.get_sound_for_part(part) or fps_config.sounds.default_break
 	sound.PlayOnRemove = true
 	sound.Parent = part
 
