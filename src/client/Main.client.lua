@@ -7,6 +7,7 @@ local shared_modules = ReplicatedStorage:WaitForChild("Shared")
 
 local Descend = require(shared_modules:WaitForChild("Descend"))
 local FPS = require(script.Parent:WaitForChild("Client"):WaitForChild("FPS"))
+local fps_config = require(shared_modules:WaitForChild("fps_config"))
 
 local client = Players.LocalPlayer
 
@@ -40,7 +41,7 @@ UserInputService.InputBegan:Connect(function(input, engine_processed)
 		return
 	end
 
-	if input.UserInputType == Enum.UserInputType.MouseButton2 and not q_aiming  then
+	if input.UserInputType == Enum.UserInputType.MouseButton2 and not q_aiming then
 		aiming = true
 		-- Descend(client.Character, "Humanoid").WalkSpeed /= 2
 		fps:aim_down_sights("start")
@@ -62,16 +63,16 @@ UserInputService.InputBegan:Connect(function(input, engine_processed)
 		end
 	elseif input.UserInputType == Enum.UserInputType.Keyboard then
 		if
-			input.KeyCode == Enum.KeyCode.Q and
+			input.KeyCode == fps_config.keybinds.second_aim and
 			not UserInputService:IsMouseButtonPressed(Enum.UserInputType.MouseButton2)
 		then
 			q_aiming = not q_aiming
 			aiming = not aiming
 			-- Descend(client.Character, "Humanoid").WalkSpeed /= if q_aiming then 2 else 0.5
 			fps:aim_down_sights(if aiming then "start" else "stop")
-		elseif input.KeyCode == Enum.KeyCode.R then
+		elseif input.KeyCode == fps_config.keybinds.reload then
 			fps:reload()
-		elseif input.KeyCode == Enum.KeyCode.H then
+		elseif input.KeyCode == fps_config.keybinds.admire then
 			fps:admire_weapon()
 		end
 
