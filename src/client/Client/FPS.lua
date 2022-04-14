@@ -46,7 +46,6 @@ function FPS.new(view_model: Model): FPS
 	local self = setmetatable({ }, FPS)
 
 	self.view_model = view_model:Clone()
-	self.weapon = Instance.new("Model")
 	self.is_aiming = false
 	self.is_equipped = false
 	self.is_reloading = false
@@ -214,7 +213,7 @@ function FPS:equip(weapon: Model)
 
 				impact_part.CFrame = CFrame.lookAt(result.Position, result.Position + result.Normal + offset)
 				impact_part.Color = part.Color
-				impact_part.Parent = Workspace
+				impact_part.Parent = Descend(Workspace, "FpsBullets")
 
 				Descend(impact_part, "Decal").Color3 = part.Color
 				Descend(impact_part, "WeldConstraint").Part1 = part
@@ -359,8 +358,8 @@ function FPS:shoot()
 	end
 
 	local shoot_part = Descend(weapon, "Shoot")
+	local fire = Descend(weapon.PrimaryPart, "Fire") :: Sound
 	local flash = Descend(shoot_part, "Flash") :: ParticleEmitter
-	local fire = Descend(shoot_part, "Fire") :: Sound
 
 	local shoot_track = Descend(self.view_model, "Humanoid"):WaitForChild("Animator"):LoadAnimation(
 		Descend(weapon, "Animations"):WaitForChild("Shoot")
@@ -403,14 +402,14 @@ function FPS:reload()
 	Descend(remote_events, "Reload"):FireServer()
 
 	local needed_ammo = self.weapon:GetAttribute("MaxAmmo") - self.weapon:GetAttribute("Ammo")
-	self.weapon:SetAttribute("ClipAmmo", needed_ammo)
+	self.weapon:SetAttribute("ReserveAmmo", needed_ammo)
 	self.weapon:SetAttribute("Ammo", self.weapon:GetAttribute("MaxAmmo"))
 
-	if self.weapon:GetAttribute("ClipAmmo") < 0 then
+	if self.weapon:GetAttribute("ReserveAmmo") < 0 then
 		-- without this check the clip/reserve ammo could go negative,
 		-- so this just adds it back to the ammo and then sets it back to 0
-		self.weapon:SetAttribute("Ammo", self.weapon:GetAttribute("Ammo") + self.weapon:GetAttribute("ClipAmmo"))
-		self.weapon:SetAttribute("ClipAmmo", 0)
+		self.weapon:SetAttribute("Ammo", self.weapon:GetAttribute("Ammo") + self.weapon:GetAttribute("ReserveAmmo"))
+		self.weapon:SetAttribute("ReserveAmmo", 0)
 	end
 
 	self.is_reloading = false
@@ -455,7 +454,7 @@ type FPS = {
 	update_server: (self: FPS, dt: number) -> (),
 	aim_down_sights: (self: FPS, state: "start" | "stop") -> (),
 	equip: (self: FPS, weapon: Model) -> (),
-	unequip: (self: FPS, weapon: Model) -> (),
+	unequip: (self: FPS) -> (),
 	shoot: (self: FPS) -> (),
 	reload: (self: FPS) -> (),
 	admire_weapon: (self: FPS) -> (),

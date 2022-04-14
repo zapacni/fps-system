@@ -243,14 +243,18 @@ Descend(remote_events, "Reload").OnServerEvent:Connect(function(player)
 
 	if weapon:GetAttribute("Ammo") then
 		local needed_ammo = weapon:GetAttribute("MaxAmmo") - weapon:GetAttribute("Ammo")
-		weapon:SetAttribute("ClipAmmo", needed_ammo)
+		weapon:SetAttribute("ReserveAmmo", needed_ammo)
 		weapon:SetAttribute("Ammo", weapon:GetAttribute("MaxAmmo"))
 
-		if weapon:GetAttribute("ClipAmmo") < 0 then
+		local needed_ammo = weapon:GetAttribute("MaxAmmo") - weapon:GetAttribute("Ammo")
+		weapon:SetAttribute("ReserveAmmo", needed_ammo)
+		weapon:SetAttribute("Ammo", weapon:GetAttribute("MaxAmmo"))
+
+		if weapon:GetAttribute("ReserveAmmo") < 0 then
 			-- without this check the clip/reserve ammo could go negative,
 			-- so this just adds it back to the ammo and then sets it back to 0
-			weapon:SetAttribute("Ammo", weapon:GetAttribute("Ammo") + weapon:GetAttribute("ClipAmmo"))
-			weapon:SetAttribute("ClipAmmo", 0)
+			weapon:SetAttribute("Ammo", weapon:GetAttribute("Ammo") + weapon:GetAttribute("ReserveAmmo"))
+			weapon:SetAttribute("ReserveAmmo", 0)
 		end
 	end
 end)
