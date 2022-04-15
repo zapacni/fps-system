@@ -41,7 +41,6 @@ local function get_bobbing(addition: number, speed: number, modifier: number): n
 end
 
 local function create_ui(fps: FPS): ScreenGui
-	print("Created UI")
 	return Fusion.New "ScreenGui" {
 		Name = "FpsGui",
 		Parent = Descend(client, "PlayerGui"),
@@ -92,8 +91,6 @@ local function set_weapons(fps: FPS, weapon: Model)
 	data.fusion = { }
 	data.fusion.value = Fusion.Value(weapon:GetAttribute("Ammo"))
 	data.fusion.computed = Fusion.Computed(function()
-		print("Computed")
-		print(data.fusion.value:get())
 		return string.format("%d / %d", data.fusion.value:get(), weapon:GetAttribute("ReserveAmmo"))
 	end)
 
