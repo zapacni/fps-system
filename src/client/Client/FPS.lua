@@ -21,6 +21,7 @@ local random_vector_offset = require(shared_modules:WaitForChild("random_vector_
 local PlayerMouse2 = require(script.Parent:WaitForChild("PlayerMouse2"))
 local FastCast = require(shared_modules:WaitForChild("FastCast"))
 local Descend = require(shared_modules:WaitForChild("Descend"))
+local Fusion = require(script.Parent:WaitForChild("Fusion"))
 
 local client = Players.LocalPlayer
 local camera = Workspace.CurrentCamera
@@ -39,6 +40,63 @@ local function get_bobbing(addition: number, speed: number, modifier: number): n
 	return math.sin(os.clock() * addition * speed) * modifier
 end
 
+local function create_ui(fps: FPS): ScreenGui
+	return Fusion.New "ScreenGui" {
+		Name = "FpsGui",
+		Parent = Descend(client, "PlayerGui"),
+
+		[Fusion.Children] = {
+			Fusion.New "Frame" {
+				Name = "Container",
+				BackgroundTransparency = 1,
+				Position = UDim2.fromScale(0.75, 0.75),
+				Size = UDim2.fromScale(0.2, 0.15, 0),
+
+				[Fusion.Children] = {
+					Fusion.New "TextLabel" {
+						Name = "WeaponName",
+						BackgroundTransparency = 1,
+						Size = UDim2.fromScale(1, 0.25),
+						Text = fps.weapon.Name,
+						TextColor3 = Color3.fromRGB(255, 255, 255),
+						TextScaled = true,
+						TextStrokeTransparency = 0
+					},
+
+					Fusion.New "Frame" {
+						Name = "Divider",
+						Position = UDim2.fromScale(0, 0.1),
+						Size = UDim2.fromScale(1, 0.025)
+					},
+
+					Fusion.New "TextLabel" {
+						Name = "AmmoDisplay",
+						BackgroundTransparency = 1,
+						Position = UDim2.fromScale(0, 0.5),
+						Size = UDim2.fromScale(1, 0.25),
+						Text = fps.weapons[fps.weapon.Name].fusion.computed,
+						TextColor3 = Color3.fromRGB(255, 255, 255),
+						TextScaled = true,
+						TextStrokeTransparency = 0
+					}
+				}
+			}
+		}
+	}
+end
+
+local function set_weapons(fps: FPS, weapon: Model)
+	local data = { }
+	data.attributes = weapon:GetAttributes()
+	data.fusion = { }
+	data.fusion.value = Fusion.Value(weapon:GetAttribute("Ammo"))
+	data.fusion.computed = Fusion.Computed(function()
+		return string.format("%d / %d", data.fusion.value:get(), weapon:GetAttribute("ReserveAmmo"))
+	end)
+
+	fps.weapons[weapon.Name] = data
+end
+
 local FPS = { }
 FPS.__index = FPS
 
@@ -52,6 +110,7 @@ function FPS.new(view_model: Model): FPS
 	self.is_running = false
 	self.is_admiring = false
 	self.aim_count = 0
+
 	self.bobbing = Spring.new(Vector3.new())
 	self.bobbing.Damper = 0.8
 	self.bobbing.Speed = 8
@@ -69,6 +128,7 @@ function FPS.new(view_model: Model): FPS
 		behavior = FastCast.newBehavior(),
 		connections = { }
 	}
+	self.weapons = { }
 
 	local params = RaycastParams.new()
 	params.FilterType = Enum.RaycastFilterType.Blacklist
@@ -135,6 +195,7 @@ function FPS:update(dt: number)
 			0
 		)
 	)
+
 	self.view_model:PivotTo(self.view_model:GetPivot() * CFrame.Angles(0, -self.sway.Position.X, self.sway.Position.Y))
 	self.view_model:PivotTo(
 		self.view_model:GetPivot() * CFrame.Angles(
@@ -196,14 +257,20 @@ function FPS:equip(weapon: Model)
 		self:unequip()
 	end
 
-	Descend(remote_events, "Equip"):FireServer(weapon.Name)
-	self.weapon = weapon:Clone()
-	self.weapon.Parent = self.view_model
-	Descend(self.view_model.PrimaryPart, "Weapon").Part1 = self.weapon.PrimaryPart
-	Descend(self.view_model, "Humanoid"):WaitForChild("Animator"):LoadAnimation(
-		Descend(self.weapon, "Animations"):WaitForChild("Idle")
-	):Play(0)
+	weapon = weapon:Clone()
 
+	local data = self.weapons[weapon.Name]
+
+	if data then
+		local attributes = data.attributes
+
+		for name, value in pairs(attributes) do
+			weapon:SetAttribute(name, value)
+		end
+	end
+
+	self.weapon = weapon
+	self.weapon.Parent = self.view_model
 	self.gun_info.connections = {
 		self.gun_info.caster.RayHit:Connect(function(_, result: RaycastResult)
 			local part = result.Instance
@@ -260,6 +327,14 @@ function FPS:equip(weapon: Model)
 		end)
 	}
 
+	Descend(remote_events, "Equip"):FireServer(weapon.Name)
+	Descend(self.view_model.PrimaryPart, "Weapon").Part1 = self.weapon.PrimaryPart
+	Descend(self.view_model, "Humanoid"):WaitForChild("Animator"):LoadAnimation(
+		Descend(self.weapon, "Animations"):WaitForChild("Idle")
+	):Play(0)
+
+	set_weapons(self, weapon)
+	create_ui(self)
 	self.is_equipped = true
 end
 
@@ -268,13 +343,22 @@ function FPS:unequip()
 		self:aim_down_sights("stop")
 	end
 
+	local ui = Descend(client, "PlayerGui"):FindFirstChild("FpsGui")
+
+	if ui then
+		print("ui destroyed")
+		ui:Destroy()
+	end
+
 	Descend(remote_events, "Unequip"):FireServer()
 
 	local weapon = self.weapon
 
 	if weapon then
+		set_weapons(self, weapon)
 		weapon:Destroy()
 		Descend(self.view_model.PrimaryPart, "Weapon").Part1 = nil
+		self.weapon = nil
 	end
 
 	local tracks = Descend(
@@ -294,7 +378,6 @@ function FPS:unequip()
 
 	table.clear(self.gun_info.connections)
 
-	PlayerMouse2.IconEnabled = true
 	self.is_equipped = false
 end
 
@@ -377,8 +460,8 @@ function FPS:shoot()
 		self.recoil:Impulse(-(if self.is_aiming then recoil / 2 else recoil))
 	end)
 
-	ammo -= 1
-	weapon:SetAttribute("Ammo", ammo)
+	self.weapons[weapon.Name].fusion.value:set(self.weapons[weapon.Name].fusion.value:get() - 1)
+	weapon:SetAttribute("Ammo", self.weapons[weapon.Name].fusion.value:get())
 end
 
 function FPS:reload()
@@ -402,7 +485,7 @@ function FPS:reload()
 	Descend(remote_events, "Reload"):FireServer()
 
 	local needed_ammo = self.weapon:GetAttribute("MaxAmmo") - self.weapon:GetAttribute("Ammo")
-	self.weapon:SetAttribute("ReserveAmmo", needed_ammo)
+	self.weapon:SetAttribute("ReserveAmmo", self.weapon:GetAttribute("ReserveAmmo") - needed_ammo)
 	self.weapon:SetAttribute("Ammo", self.weapon:GetAttribute("MaxAmmo"))
 
 	if self.weapon:GetAttribute("ReserveAmmo") < 0 then
@@ -412,6 +495,7 @@ function FPS:reload()
 		self.weapon:SetAttribute("ReserveAmmo", 0)
 	end
 
+	self.weapons[self.weapon.Name].fusion.value:set(self.weapon:GetAttribute("Ammo"))
 	self.is_reloading = false
 end
 
@@ -449,6 +533,7 @@ type FPS = {
 		behavior: FastCast.FastCastBehavior,
 		connections: { RBXScriptConnection }
 	},
+	weapons: { [string]: { [string]: any } },
 
 	update: (self: FPS, dt: number) -> (),
 	update_server: (self: FPS, dt: number) -> (),
