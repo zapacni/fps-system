@@ -9,6 +9,15 @@ local fps_config = {
 		admire = Enum.KeyCode.H,
 		second_aim = Enum.KeyCode.Q,
 	},
+
+	bullets = {
+		impact_lifetime = 2,
+	},
+
+	explosions = {
+		radius_multiplier = 2,
+		time_between = 0.2,
+	},
 }
 
 return fps_config

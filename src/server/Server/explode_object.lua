@@ -13,7 +13,7 @@ local function explode_object(part: BasePart)
 
 	local destructiveness = part:GetAttribute("Destructiveness")
 	local explosion = Instance.new("Explosion")
-	explosion.BlastRadius = 2 * part.Size.Magnitude
+	explosion.BlastRadius = fps_config.explosions.radius_multiplier * part.Size.Magnitude
 	explosion.DestroyJointRadiusPercent = destructiveness
 	explosion.Position = part.Position
 
@@ -23,11 +23,11 @@ local function explode_object(part: BasePart)
 		end
 
 		if hit_part:GetAttribute("Breakable") then
-			fracture_part(hit_part, hit_part.Position, hit_part.CFrame.LookVector * (distance / 2), 5)
+			fracture_part(hit_part, nil, hit_part.CFrame.LookVector * distance)
 		end
 
 		if hit_part:GetAttribute("Explosive") then
-			task.wait(0.2)
+			task.wait(fps_config.explosions.time_between)
 			explode_object(hit_part)
 		end
 	end)

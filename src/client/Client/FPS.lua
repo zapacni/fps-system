@@ -65,15 +65,15 @@ local function create_ui(fps: FPS): ScreenGui
 
 					Fusion.New "Frame" {
 						Name = "Divider",
-						Position = UDim2.fromScale(0, 0.1),
+						Position = UDim2.fromScale(0, 0.25),
 						Size = UDim2.fromScale(1, 0.025)
 					},
 
 					Fusion.New "TextLabel" {
 						Name = "AmmoDisplay",
 						BackgroundTransparency = 1,
-						Position = UDim2.fromScale(0, 0.5),
-						Size = UDim2.fromScale(1, 0.25),
+						Position = UDim2.fromScale(0, 0.25),
+						Size = UDim2.fromScale(1, 0.5),
 						Text = fps.weapons[fps.weapon.Name].fusion.computed,
 						TextColor3 = Color3.fromRGB(255, 255, 255),
 						TextScaled = true,
@@ -178,7 +178,7 @@ function FPS:update(dt: number)
 	local delta = PlayerMouse2.Delta * dt * 60
 
 	if self.is_aiming then
-		delta *= 0.05
+		delta *= 0.1
 	end
 
 	self.sway:Impulse(Vector3.new(delta.X * 0.0025, delta.Y * 0.005, 0))
@@ -346,7 +346,6 @@ function FPS:unequip()
 	local ui = Descend(client, "PlayerGui"):FindFirstChild("FpsGui")
 
 	if ui then
-		print("ui destroyed")
 		ui:Destroy()
 	end
 
