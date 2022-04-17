@@ -12,6 +12,7 @@ local fps_config = {
 
 	bullets = {
 		impact_lifetime = 2,
+		leave_impact = true,
 	},
 
 	explosions = {
