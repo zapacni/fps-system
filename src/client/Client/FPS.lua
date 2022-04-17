@@ -275,7 +275,7 @@ function FPS:equip(weapon: Model)
 	self.gun_info.connections = {
 		self.gun_info.caster.RayHit:Connect(function(_, result: RaycastResult)
 			local part = result.Instance
-			if not part.Parent:FindFirstChildOfClass("Humanoid") then
+			if not part.Parent:FindFirstChildOfClass("Humanoid") and fps_config.bullets.leave_impact then
 				local impact_part = Descend(ReplicatedStorage, "FpsSystemAssets"):WaitForChild("BulletHole"):Clone()
 				local offset = Vector3.new(0, -impact_part.Size.Y / 2, 0)
 
