@@ -22,6 +22,7 @@ local PlayerMouse2 = require(script.Parent:WaitForChild("PlayerMouse2"))
 local FastCast = require(shared_modules:WaitForChild("FastCast"))
 local Descend = require(shared_modules:WaitForChild("Descend"))
 local Fusion = require(script.Parent:WaitForChild("Fusion"))
+local fps_config = require(shared_modules:WaitForChild("fps_config"))
 
 local client = Players.LocalPlayer
 local camera = Workspace.CurrentCamera
@@ -248,7 +249,7 @@ function FPS:aim_down_sights(state: "start" | "stop")
 		camera.FieldOfView = lerp(start_fov, goal_fov, i / 100)
 	end
 
-	self.bobbing.Damper = if is_aiming then 4 else 0.8
+	self.bobbing.Damper = if is_aiming then 2 else 0.8
 end
 
 function FPS:equip(weapon: Model)
@@ -297,7 +298,7 @@ function FPS:equip(weapon: Model)
 				params.FilterDescendantsInstances = filter
 
 				coroutine.wrap(function()
-					task.wait(2)
+					task.wait(fps_config.bullets.impact_lifetime)
 					impact_part:Destroy()
 
 					local filter = params.FilterDescendantsInstances
