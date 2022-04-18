@@ -51,7 +51,7 @@ local function create_ui(fps: FPS): ScreenGui
 				Name = "Container",
 				BackgroundTransparency = 1,
 				Position = UDim2.fromScale(0.75, 0.75),
-				Size = UDim2.fromScale(0.2, 0.15, 0),
+				Size = UDim2.fromScale(0.2, 0.15),
 
 				[Fusion.Children] = {
 					Fusion.New "TextLabel" {
