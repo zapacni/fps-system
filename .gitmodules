@@ -1,0 +1,3 @@
+[submodule "src/client/Fusion"]
+	path = src/client/Fusion
+	url = https://github.com/Elttob/Fusion
