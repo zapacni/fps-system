@@ -301,9 +301,9 @@ function FPS:equip(weapon: Model)
 					task.wait(fps_config.bullets.impact_lifetime)
 					impact_part:Destroy()
 
-					local filter = params.FilterDescendantsInstances
-					table.remove(filter, table.find(filter, impact_part) or 0)
-					params.FilterDescendantsInstances = filter
+					local _filter = params.FilterDescendantsInstances
+					table.remove(_filter, table.find(_filter, impact_part) or 0)
+					params.FilterDescendantsInstances = _filter
 				end)()
 			end
 		end),
