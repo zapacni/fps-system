@@ -5,8 +5,8 @@ local shared_modules = ReplicatedStorage:WaitForChild("Shared")
 
 local Descend = require(shared_modules:WaitForChild("Descend"))
 
-local remotes = Descend(ReplicatedStorage, "Remotes")
-local remote_events = Descend(remotes, "RemoteEvents")
+local remotes = ReplicatedStorage:WaitForChild("Remotes")
+local remote_events = remotes:WaitForChild("RemoteEvents")
 
 local bullet_template = Descend(ReplicatedStorage, "FpsSystemAssets"):WaitForChild("BulletTemplate")
 local bullets_folder = Workspace:WaitForChild("FpsBullets")

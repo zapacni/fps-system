@@ -11,8 +11,8 @@ local fracture_part = require(server_modules:WaitForChild("fracture_part"))
 local FastCast = require(shared_modules:WaitForChild("FastCast"))
 local Descend = require(shared_modules:WaitForChild("Descend"))
 
-local weapons = Descend(ReplicatedStorage, "Weapons")
-local remotes = Descend(ReplicatedStorage, "Remotes")
+local weapons = ReplicatedStorage:WaitForChild("Weapons")
+local remotes = ReplicatedStorage:WaitForChild("Remotes")
 local remote_events = Descend(remotes, "RemoteEvents")
 local real_weapons = Descend(weapons, "Real")
 
