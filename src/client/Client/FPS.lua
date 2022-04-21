@@ -169,7 +169,11 @@ function FPS:update(dt: number)
 
 	local character = client.Character
 	local humanoid = Descend(character, "Humanoid") :: Humanoid
-	local velocity = character.PrimaryPart.AssemblyLinearVelocity
+	local move_vector = character.PrimaryPart.AssemblyLinearVelocity
+	local velocity = if move_vector.Magnitude > 0.1 then
+		move_vector
+	else
+		Vector3.new(math.random(), math.random(), math.random()) / 5
 	local movement_sway = Vector3.new(
 		get_bobbing(10 * (humanoid.WalkSpeed / 16), MOVEMENT_SPEED, MODIFIER),
 		get_bobbing(5 * (humanoid.WalkSpeed / 16), MOVEMENT_SPEED, MODIFIER),
@@ -334,6 +338,7 @@ function FPS:equip(weapon: Model)
 		Descend(self.weapon, "Animations"):WaitForChild("Idle")
 	):Play(0)
 
+	weapon:SetAttribute("Offset", weapon:GetAttribute("DefaultOffset"))
 	set_weapons(self, weapon)
 	create_ui(self)
 	self.is_equipped = true
@@ -355,6 +360,7 @@ function FPS:unequip()
 	local weapon = self.weapon
 
 	if weapon then
+		weapon:SetAttribute("Offset", weapon:GetAttribute("DefaultOffset"))
 		set_weapons(self, weapon)
 		weapon:Destroy()
 		Descend(self.view_model.PrimaryPart, "Weapon").Part1 = nil

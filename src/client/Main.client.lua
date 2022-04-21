@@ -20,15 +20,15 @@ local q_aiming = false
 -- local ui = fps:create_character_ui(player_gui)
 
 local function shoot()
-	shooting = true
-
-	if fps.weapon:GetAttribute("Ammo") > 0 then
-		-- Descend(client.Character, "Humanoid").WalkSpeed /= 2
+	if fps.weapon:GetAttribute("Ammo") <= 0 then
+		return
 	end
 
+	shooting = true
+	Descend(client.Character, "Humanoid").WalkSpeed /= 2
 	fps:shoot()
 	task.wait(60 / fps.weapon:GetAttribute("FireRate"))
-	-- Descend(client.Character, "Humanoid").WalkSpeed *= 2
+	Descend(client.Character, "Humanoid").WalkSpeed *= 2
 	shooting = false
 end
 
@@ -43,7 +43,7 @@ UserInputService.InputBegan:Connect(function(input, engine_processed)
 
 	if input.UserInputType == Enum.UserInputType.MouseButton2 and not q_aiming then
 		aiming = true
-		-- Descend(client.Character, "Humanoid").WalkSpeed /= 2
+		Descend(client.Character, "Humanoid").WalkSpeed /= 2
 		fps:aim_down_sights("start")
 	elseif input.UserInputType == Enum.UserInputType.MouseButton1 then
 		local weapon = fps.weapon
@@ -68,7 +68,7 @@ UserInputService.InputBegan:Connect(function(input, engine_processed)
 		then
 			q_aiming = not q_aiming
 			aiming = not aiming
-			-- Descend(client.Character, "Humanoid").WalkSpeed /= if q_aiming then 2 else 0.5
+			Descend(client.Character, "Humanoid").WalkSpeed /= if q_aiming then 2 else 0.5
 			fps:aim_down_sights(if aiming then "start" else "stop")
 		elseif input.KeyCode == fps_config.keybinds.reload then
 			fps:reload()
@@ -107,7 +107,7 @@ UserInputService.InputEnded:Connect(function(input, engine_processed)
 
 	if input.UserInputType == Enum.UserInputType.MouseButton2 and not q_aiming then
 		aiming = false
-		-- Descend(client.Character, "Humanoid").WalkSpeed *= 2
+		Descend(client.Character, "Humanoid").WalkSpeed *= 2
 		fps:aim_down_sights("stop")
 	end
 end)
